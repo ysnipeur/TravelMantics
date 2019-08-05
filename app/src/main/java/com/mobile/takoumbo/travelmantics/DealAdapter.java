@@ -2,10 +2,12 @@ package com.mobile.takoumbo.travelmantics;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -13,6 +15,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -27,6 +30,8 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
     private ArrayList<TravelDeals> listOfDeals;
     private ChildEventListener childEventListener;
     private static  UserActivity callerActivity;
+
+    private ImageView imageView;
 
 
     public DealAdapter(UserActivity caller)
@@ -120,6 +125,8 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
             description = itemView.findViewById(R.id.textViewDescription);
             price = itemView.findViewById(R.id.textViewPrice);
 
+            imageView = itemView.findViewById(R.id.imageSelected);
+
             itemView.setOnClickListener(this);
         }
 
@@ -128,6 +135,7 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
             title.setText(travelDeals.getTitle());
             description.setText(travelDeals.getDescription());
             price.setText(travelDeals.getPrice());
+            showImage(travelDeals.getImageUrl());
         }
 
         @Override
@@ -141,6 +149,17 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
             intent.putExtra("selectedDeal", selectedDeal);
 
             v.getContext().startActivity(intent);
+        }
+
+        private void showImage(String url)
+        {
+            if(url != null && !(url.isEmpty())) {
+
+                Picasso.with(callerActivity)
+                        .load(url)
+                        .centerCrop()
+                        .into(imageView);
+            }
         }
     }
 }

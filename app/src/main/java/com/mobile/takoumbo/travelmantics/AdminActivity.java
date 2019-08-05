@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -20,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 public class AdminActivity extends AppCompatActivity {
 
@@ -27,6 +30,19 @@ public class AdminActivity extends AppCompatActivity {
 
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
+
+    // Variables for our travel deals
+
+    EditText txtTitle;
+    EditText txtPrice;
+    EditText txtDescription;
+
+    ImageView imageView;
+    private TravelDeals newDeal;
+
+    private static final int PICTURE_RESULT = 47;
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -44,20 +60,12 @@ public class AdminActivity extends AppCompatActivity {
 
                     String url = reference.getDownloadUrl().toString();
                     newDeal.setImageUrl(url);
+                    showImage(url);
                 }
             });
         }
     }
 
-
-// Variables for our travel deals
-
-    EditText txtTitle;
-    EditText txtPrice;
-    EditText txtDescription;
-    private TravelDeals newDeal;
-
-    private static final int PICTURE_RESULT = 47;
 
 
     @Override
@@ -67,22 +75,20 @@ public class AdminActivity extends AppCompatActivity {
 
         // Initialising references
 
-        //FirebaseUtile.opendFirebaseReference("traveldeals", this);
+
         firebaseDatabase = FirebaseUtile.firebaseDatabase;
         databaseReference = FirebaseUtile.databaseReference;
 
         Button btnAddImage = findViewById(R.id.btnSelectImage);
 
         btnAddImage.setOnClickListener(new View.OnClickListener()
-
-
         {
 
             @Override
             public void onClick(View view)
             {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/jpeg");
+                intent.setType("image");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
                 startActivityForResult(intent.createChooser(intent, "SELECT AN IMAGE"), PICTURE_RESULT);
             }
@@ -92,10 +98,22 @@ public class AdminActivity extends AppCompatActivity {
         txtTitle = findViewById(R.id.txtTitle);
         txtPrice = findViewById(R.id.txtPrice);
         txtDescription = findViewById(R.id.txtDescription);
+        imageView = findViewById(R.id.imageSelected);
 
         getSelectedItem();
 
+    }
 
+    private void showImage(String url)
+    {
+        if(url != null && !(url.isEmpty())) {
+            int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+            Picasso.with(this)
+                    .load(url)
+                    .resize(width, width * 2 / 3)
+                    .centerCrop()
+                    .into(imageView);
+        }
     }
 
 
@@ -117,6 +135,7 @@ public class AdminActivity extends AppCompatActivity {
             txtTitle.setText(newDeal.getTitle());
             txtDescription.setText(newDeal.getDescription());
             txtPrice.setText(newDeal.getPrice());
+            showImage(newDeal.getImageUrl());
         }
 
     }
