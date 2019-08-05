@@ -1,17 +1,25 @@
 package com.mobile.takoumbo.travelmantics;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class AdminActivity extends AppCompatActivity {
 
@@ -20,12 +28,36 @@ public class AdminActivity extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
 
-    // Variables for our travel deals
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == PICTURE_RESULT && resultCode == RESULT_OK)
+        {
+            Uri imageUri = data.getData();
+            final StorageReference reference = FirebaseUtile.storageReference.child(imageUri.getLastPathSegment());
+            reference.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    // Let's get the downloaded image to store for our deal
+
+                    String url = reference.getDownloadUrl().toString();
+                    newDeal.setImageUrl(url);
+                }
+            });
+        }
+    }
+
+
+// Variables for our travel deals
 
     EditText txtTitle;
     EditText txtPrice;
     EditText txtDescription;
     private TravelDeals newDeal;
+
+    private static final int PICTURE_RESULT = 47;
 
 
     @Override
@@ -38,6 +70,24 @@ public class AdminActivity extends AppCompatActivity {
         //FirebaseUtile.opendFirebaseReference("traveldeals", this);
         firebaseDatabase = FirebaseUtile.firebaseDatabase;
         databaseReference = FirebaseUtile.databaseReference;
+
+        Button btnAddImage = findViewById(R.id.btnSelectImage);
+
+        btnAddImage.setOnClickListener(new View.OnClickListener()
+
+
+        {
+
+            @Override
+            public void onClick(View view)
+            {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(intent.createChooser(intent, "SELECT AN IMAGE"), PICTURE_RESULT);
+            }
+
+        });
 
         txtTitle = findViewById(R.id.txtTitle);
         txtPrice = findViewById(R.id.txtPrice);
