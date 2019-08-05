@@ -77,7 +77,6 @@ public class FirebaseUtile {
 
             connectStorage();
 
-
         }
         listOfDeals = new ArrayList<>();
         databaseReference = firebaseDatabase.getReference().child(ref);

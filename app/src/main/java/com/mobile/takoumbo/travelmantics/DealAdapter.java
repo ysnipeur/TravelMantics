@@ -1,27 +1,28 @@
 package com.mobile.takoumbo.travelmantics;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+        import android.app.Activity;
+        import android.content.Intent;
+        import android.content.res.Resources;
+        import android.util.Log;
+        import android.view.LayoutInflater;
+        import android.view.View;
+        import android.view.ViewGroup;
+        import android.widget.ImageView;
+        import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.picasso.Picasso;
+        import com.google.firebase.database.ChildEventListener;
+        import com.google.firebase.database.DataSnapshot;
+        import com.google.firebase.database.DatabaseError;
+        import com.google.firebase.database.DatabaseReference;
+        import com.google.firebase.database.FirebaseDatabase;
+        import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+        import java.util.ArrayList;
+        import java.util.Objects;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
+        import androidx.annotation.NonNull;
+        import androidx.annotation.Nullable;
+        import androidx.recyclerview.widget.RecyclerView;
 
 public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder> implements View.OnClickListener {
 
@@ -30,7 +31,6 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
     private ArrayList<TravelDeals> listOfDeals;
     private ChildEventListener childEventListener;
     private static  UserActivity callerActivity;
-
     private ImageView imageView;
 
 
@@ -50,7 +50,7 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
                 // this method is for getting values from firebase database
                 TravelDeals travelDeals = dataSnapshot.getValue(TravelDeals.class);
 
-                Log.d("Deal", travelDeals.getTitle());
+                Log.d("Deal", Objects.requireNonNull(travelDeals).getTitle());
                 travelDeals.setId(dataSnapshot.getKey());
 
                 // Adding current deal to list of deals
@@ -97,9 +97,11 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull DaelViewHolder holder, int position) {
-            TravelDeals currentDeal = listOfDeals.get(position);
+        TravelDeals currentDeal = listOfDeals.get(position);
 
-            holder.bind(currentDeal);
+        Log.d("current deal url", currentDeal.getImageUrl());
+
+        holder.bind(currentDeal);
     }
 
     @Override
@@ -118,6 +120,10 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
         private TextView description;
         private TextView price;
 
+        private ImageView dealImage;
+
+
+
 
         public DaelViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -125,9 +131,11 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
             description = itemView.findViewById(R.id.textViewDescription);
             price = itemView.findViewById(R.id.textViewPrice);
 
-            imageView = itemView.findViewById(R.id.imageSelected);
+            dealImage = itemView.findViewById(R.id.dealImage);
+
 
             itemView.setOnClickListener(this);
+
         }
 
         public void bind(TravelDeals travelDeals)
@@ -136,6 +144,8 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
             description.setText(travelDeals.getDescription());
             price.setText(travelDeals.getPrice());
             showImage(travelDeals.getImageUrl());
+
+            Log.d("Image url", travelDeals.getImageUrl());
         }
 
         @Override
@@ -153,12 +163,13 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
 
         private void showImage(String url)
         {
-            if(url != null && !(url.isEmpty())) {
+            if((url != null) && !(url.isEmpty())) {
 
-                Picasso.with(callerActivity)
+                Picasso.with(dealImage.getContext())
                         .load(url)
+                        .resize(490, 300)
                         .centerCrop()
-                        .into(imageView);
+                        .into(dealImage);
             }
         }
     }

@@ -3,14 +3,17 @@ package com.mobile.takoumbo.travelmantics;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
@@ -41,31 +45,9 @@ public class AdminActivity extends AppCompatActivity {
     private TravelDeals newDeal;
 
     private static final int PICTURE_RESULT = 47;
+    private Uri imageUri;
 
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == PICTURE_RESULT && resultCode == RESULT_OK)
-        {
-            Uri imageUri = data.getData();
-            final StorageReference reference = FirebaseUtile.storageReference.child(imageUri.getLastPathSegment());
-            reference.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    // Let's get the downloaded image to store for our deal
-
-                    String url = reference.getDownloadUrl().toString();
-                    newDeal.setImageUrl(url);
-                    showImage(url);
-                }
-            });
-        }
-    }
-
+    private StorageTask uploadTask;
 
 
     @Override
@@ -74,33 +56,86 @@ public class AdminActivity extends AppCompatActivity {
         setContentView(R.layout.activity_insert);
 
         // Initialising references
-
-
         firebaseDatabase = FirebaseUtile.firebaseDatabase;
         databaseReference = FirebaseUtile.databaseReference;
-
-        Button btnAddImage = findViewById(R.id.btnSelectImage);
-
-        btnAddImage.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View view)
-            {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(intent.createChooser(intent, "SELECT AN IMAGE"), PICTURE_RESULT);
-            }
-
-        });
 
         txtTitle = findViewById(R.id.txtTitle);
         txtPrice = findViewById(R.id.txtPrice);
         txtDescription = findViewById(R.id.txtDescription);
         imageView = findViewById(R.id.imageSelected);
 
+        Button btnAddImage = findViewById(R.id.btnSelectImage);
+
+        btnAddImage.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                FileChooser();
+            }
+
+        });
+
         getSelectedItem();
+
+    }
+
+    private void FileChooser()
+    {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        startActivityForResult(intent, PICTURE_RESULT);
+    }
+
+    private String getExtension(Uri uri)
+    {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    private void FileUploader()
+    {
+       final StorageReference reference = FirebaseUtile.storageReference.child(System.currentTimeMillis()+ "." + getExtension(imageUri));
+
+
+        uploadTask = reference.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                // Let's get the downloaded image to store for our deal
+
+                String url = taskSnapshot.getUploadSessionUri().toString();
+                Log.d("Uploaded url : ", url);
+                newDeal.setImageUrl(url);
+
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == PICTURE_RESULT && resultCode == RESULT_OK && data != null && data.getData() != null)
+        {
+            imageUri = data.getData();
+            imageView.setImageURI(imageUri);
+
+            if(uploadTask != null && uploadTask.isInProgress())
+            {
+                Toast.makeText(this, "Upload Still in progress", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                FileUploader();
+            }
+
+            showImage(newDeal.getImageUrl());
+        }
+
 
     }
 
@@ -110,7 +145,7 @@ public class AdminActivity extends AppCompatActivity {
             int width = Resources.getSystem().getDisplayMetrics().widthPixels;
             Picasso.with(this)
                     .load(url)
-                    .resize(width, width * 2 / 3)
+                    .resize(width, width * 2)
                     .centerCrop()
                     .into(imageView);
         }
@@ -135,8 +170,10 @@ public class AdminActivity extends AppCompatActivity {
             txtTitle.setText(newDeal.getTitle());
             txtDescription.setText(newDeal.getDescription());
             txtPrice.setText(newDeal.getPrice());
-            showImage(newDeal.getImageUrl());
+
         }
+
+        showImage(newDeal.getImageUrl());
 
     }
 
@@ -163,6 +200,8 @@ public class AdminActivity extends AppCompatActivity {
         {
             case R.id.save_menu :
                 saveDeal();
+
+
                 Toast.makeText(this, "Deal saved", Toast.LENGTH_LONG).show();
                 clean();
                 return  true;

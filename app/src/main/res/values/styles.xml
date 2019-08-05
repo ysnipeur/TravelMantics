@@ -3,14 +3,25 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/design_default_color_primary</item>
+        <item name="colorPrimaryDark">@color/design_default_color_primary_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="travelTitle" parent="@android:style/TextAppearance.Material.Medium">
+        <item name="android:textColor">@color/colorTravelTitle</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="travelDescription" parent="@android:style/TextAppearance.Material.Medium">
+        <item name="android:textColor">@color/travelDescription</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize" >21sp</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

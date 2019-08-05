@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimaryDark">#00574b</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="colorsnippeur">@color/yvan_orange</color>
+    <color name="colorListItems">#26C1ED</color>
+    <color name="colorTravelTitle">#151bbe</color>
+    <color name="yvan_orange">#f05a28</color>
+    <color name="travelDescription">#f2ad00</color>
 </resources>
