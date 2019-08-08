@@ -8,6 +8,43 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="signInTheme" parent="FirebaseUI">
+        <item name="colorPrimary">@color/design_default_color_primary_dark</item>
+        <item name="colorPrimaryDark">@color/design_default_color_primary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@android:color/white</item>
+        <item name="colorControlHighlight">@android:color/white</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="actionBarTabStyle">@style/ThemeOverlay.MaterialComponents.ActionBar.Surface</item>
+        <item name="windowActionBar">true</item>
+        <item name="android:windowBackground">@mipmap/nat</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="android:textColorHint">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme3" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/design_default_color_primary</item>
+        <item name="colorPrimaryDark">@color/design_default_color_primary_dark</item>
+        <item name="colorAccent">@color/yvan_orange</item>
+    </style>
+
+    <style name="adddeal" parent="@style/Widget.Design.FloatingActionButton">
+        <item name="srcCompat">@drawable/ic_add_deal</item>
+        <item name="android:tint">@android:color/white</item>
+    </style>
+    
+    <style name="signInTheme2" parent="AppTheme3">
+        <item name="android:textColor" >@android:color/white</item>
+        <item name="android:textSize">21sp</item>
+        <item name="android:windowBackground">@mipmap/nat</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

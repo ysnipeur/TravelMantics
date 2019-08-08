@@ -1,5 +1,6 @@
 package com.mobile.takoumbo.travelmantics;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,7 +20,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -27,6 +30,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+
+import java.util.Objects;
 
 public class AdminActivity extends AppCompatActivity {
 
@@ -48,6 +53,7 @@ public class AdminActivity extends AppCompatActivity {
     private Uri imageUri;
 
     private StorageTask uploadTask;
+    private Button btnAddImage;
 
 
     @Override
@@ -64,7 +70,7 @@ public class AdminActivity extends AppCompatActivity {
         txtDescription = findViewById(R.id.txtDescription);
         imageView = findViewById(R.id.imageSelected);
 
-        Button btnAddImage = findViewById(R.id.btnSelectImage);
+        btnAddImage = findViewById(R.id.btnSelectImage);
 
         btnAddImage.setOnClickListener(new View.OnClickListener()
         {
@@ -105,11 +111,18 @@ public class AdminActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                // Let's get the downloaded image to store for our deal
+                String imgName = taskSnapshot.getStorage().getPath();
+                newDeal.setImageName(imgName);
+                reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
 
-                String url = taskSnapshot.getUploadSessionUri().toString();
-                Log.d("Uploaded url : ", url);
-                newDeal.setImageUrl(url);
+                        newDeal.setImageUrl(String.valueOf(uri));
+
+                    }
+                });
+
+
 
             }
         });
@@ -123,6 +136,7 @@ public class AdminActivity extends AppCompatActivity {
         {
             imageUri = data.getData();
             imageView.setImageURI(imageUri);
+
 
             if(uploadTask != null && uploadTask.isInProgress())
             {
@@ -142,10 +156,10 @@ public class AdminActivity extends AppCompatActivity {
     private void showImage(String url)
     {
         if(url != null && !(url.isEmpty())) {
-            int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+
             Picasso.with(this)
                     .load(url)
-                    .resize(width, width * 2)
+                    .resize(0, 600)
                     .centerCrop()
                     .into(imageView);
         }
@@ -222,6 +236,7 @@ public class AdminActivity extends AppCompatActivity {
         txtTitle.setText("");
         txtPrice.setText("");
         txtDescription.setText("");
+
     }
 
     // Method to enable and disable edit text fields
@@ -230,6 +245,8 @@ public class AdminActivity extends AppCompatActivity {
         txtTitle.setEnabled(isEnabled);
         txtDescription.setEnabled(isEnabled);
         txtPrice.setEnabled(isEnabled);
+        btnAddImage.setEnabled(isEnabled);
+
     }
 
     // Method for saving a deal
@@ -258,7 +275,23 @@ public class AdminActivity extends AppCompatActivity {
             return;
         }
 
-        // Method to remove deal from firebase realtime database
+        // Method to remove deal from firebase realtime database and the corresponding image from storage
+
+        if(newDeal.getImageName() != null && !newDeal.getImageName().isEmpty())
+        {
+            StorageReference imageRef = FirebaseUtile.firebaseStorage.getReference().child(newDeal.getImageName());
+            imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }
 
         databaseReference.child(newDeal.getId()).removeValue();
     }

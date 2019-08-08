@@ -1,7 +1,5 @@
 package com.mobile.takoumbo.travelmantics;
 
-import android.app.Activity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -21,8 +19,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static androidx.core.app.ActivityCompat.startActivityForResult;
-
 public class FirebaseUtile {
     public static FirebaseDatabase firebaseDatabase;
     public static DatabaseReference databaseReference;
@@ -39,7 +35,7 @@ public class FirebaseUtile {
 
     public static boolean isAdmin;
 
-    // Empty constructor to avoir the class to be instanciated
+    // Empty constructor to avoid the class to be instanciated
     private FirebaseUtile()
     {
 
@@ -135,6 +131,8 @@ public class FirebaseUtile {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
+                        .setTheme(R.style.signInTheme)
+                        .setLogo(R.mipmap.goodlogo)
                         .build(),
                 RC_SIGN_IN);
     }

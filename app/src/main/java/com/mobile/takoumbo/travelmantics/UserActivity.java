@@ -57,10 +57,21 @@ public class UserActivity extends AppCompatActivity {
 
                 FirebaseUtile.detachListener();
                 return true;
+
+            case R.id.refresh_menu :
+                refresh();
+                return  true;
+
             default :
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    private void refresh()
+    {
+        Intent intent = new Intent(this, UserActivity.class);
+        startActivity(intent);
     }
 
     @Override

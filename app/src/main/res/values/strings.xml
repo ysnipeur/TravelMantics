@@ -12,4 +12,5 @@
     <string name="new_travel_deal">New travel deal</string>
     <string name="delete_travel_deal">delete travel deal</string>
     <string name="logout_menu">Log out</string>
+    <string name="refresh_menu">Refresh</string>
 </resources>

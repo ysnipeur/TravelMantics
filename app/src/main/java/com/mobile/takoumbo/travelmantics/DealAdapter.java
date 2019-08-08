@@ -99,7 +99,7 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
     public void onBindViewHolder(@NonNull DaelViewHolder holder, int position) {
         TravelDeals currentDeal = listOfDeals.get(position);
 
-        Log.d("current deal url", currentDeal.getImageUrl());
+          Log.d("current deal url", currentDeal.getImageUrl());
 
         holder.bind(currentDeal);
     }
@@ -167,8 +167,7 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DaelViewHolder
 
                 Picasso.with(dealImage.getContext())
                         .load(url)
-                        .resize(490, 300)
-                        .centerCrop()
+                        .resize(0, 600)
                         .into(dealImage);
             }
         }
